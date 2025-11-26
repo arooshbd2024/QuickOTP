@@ -4,6 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,8 +15,21 @@ const SENDER_PASSWORD = process.env.SENDER_PASSWORD || "abapwzmkocdimgml";
 const SUBJECT = "Your QuickOTP OTP Code";
 const HTML_TEMPLATE_PATH = "./res/otp.html";
 
+// CORS Configuration - Allow requests from anywhere
+const corsOptions = {
+  origin: '*', // For production, replace with specific domains
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(express.json({ limit: "10kb" }));
 
 // Global rate limiter to prevent abuse
@@ -110,7 +124,7 @@ function verifyKey(req, providedKey) {
 }
 
 // Cryptographically secure OTP generation
-async function generateOtp() {
+function generateOtp() {
   const crypto = await import("crypto");
   const bytes = crypto.randomBytes(3);
   return Array.from(bytes)
@@ -313,7 +327,7 @@ app.post("/emailotp", async (req, res) => {
       }
       otp = sanitizedOtp;
     } else {
-      otp = await generateOtp();
+      otp = generateOtp();
     }
 
     // Cooldown check for non-premium users
