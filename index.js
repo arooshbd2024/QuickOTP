@@ -437,10 +437,15 @@ process.on("SIGTERM", () => {
   process.exit(0);
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 QuickOTP Server running on http://localhost:${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🔒 Security: Helmet enabled`);
-  console.log(`⚡ Rate limiting: Active`);
-});
+// Start server (for local development)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`🚀 QuickOTP Server running on http://localhost:${PORT}`);
+    console.log(`📊 Environment: ${process.env.NODE_ENV || "development"}`);
+    console.log(`🔒 Security: Helmet enabled`);
+    console.log(`⚡ Rate limiting: Active`);
+  });
+}
+
+// Export for Vercel serverless functions
+export default app;
