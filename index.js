@@ -327,7 +327,7 @@ app.post("/emailotp", async (req, res) => {
       }
       otp = sanitizedOtp;
     } else {
-      otp = generateOtp();
+      otp = await generateOtp();
     }
 
     // Cooldown check for non-premium users
