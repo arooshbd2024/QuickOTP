@@ -124,7 +124,7 @@ function verifyKey(req, providedKey) {
 }
 
 // Cryptographically secure OTP generation
-function generateOtp() {
+async function generateOtp() {
   const crypto = await import("crypto");
   const bytes = crypto.randomBytes(3);
   return Array.from(bytes)
